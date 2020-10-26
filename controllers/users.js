@@ -4,6 +4,7 @@ const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 const AuthorizationError = require('../errors/authorization-err');
 const BadRequestError = require('../errors/bad-request-err');
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -89,7 +90,7 @@ module.exports.login = (req, res, next) => {
         throw new AuthorizationError('Неправильные почта или пароль');
       }
 
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', {
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', {
         expiresIn: '7d',
       });
 
