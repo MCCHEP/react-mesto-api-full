@@ -16,6 +16,7 @@ const {
 } = require('./controllers/users');
 
 const app = express();
+
 const PORT = process.env.PORT || 3000;
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -25,8 +26,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
 });
 
-app.listen(PORT);
 app.use(cors());
+app.listen(PORT);
 app.use(cookieParser());
 app.use(bodyParser.json());
 
@@ -54,9 +55,7 @@ app.post('/signup', celebrate({
 app.use(auth);
 app.use('/users', users);
 app.use('/cards', cards);
-app.all('/*', (req, res, next) => {
-  next(new Error());
-});
+
 app.use(errorLogger);
 
 app.use(errors());

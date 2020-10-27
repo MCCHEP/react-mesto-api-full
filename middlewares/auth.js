@@ -3,7 +3,8 @@ const AuthorizationError = require('../errors/authorization-err');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
-function auth(req, res, next) {
+module.exports = (req, res, next) => {
+  console.log(req.headers);
   const { authorization } = req.headers;
 
   if (!authorization && !authorization.startsWith('Bearer ')) {
@@ -22,6 +23,4 @@ function auth(req, res, next) {
   req.user = payload; // записываем пейлоуд в объект запроса
 
   next(); // пропускаем запрос дальше
-}
-
-module.exports = auth;
+};
