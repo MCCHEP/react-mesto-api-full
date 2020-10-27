@@ -48,7 +48,21 @@ module.exports.createUser = (req, res, next) => {
       if (!user) {
         throw new BadRequestError('Переданы некорректные данные!');
       }
-      res.status(201).send({ data: user });
+      const {
+        _id,
+        name,
+        about,
+        avatar,
+      } = user;
+      res.status(201).send({
+        data: {
+          _id,
+          name,
+          about,
+          avatar,
+          email,
+        },
+      });
     })
     .catch(next);
 };
@@ -61,7 +75,7 @@ module.exports.updateProfile = (req, res, next) => {
   )
     .then((user) => {
       if (!user) {
-        throw new BadRequestError('Переданы некорректные данные!');
+        throw new NotFoundError('Пользователь не найден!');
       }
       res.send({ data: user });
     })
@@ -76,7 +90,7 @@ module.exports.updateAvatar = (req, res, next) => {
   )
     .then((user) => {
       if (!user) {
-        throw new BadRequestError('Переданы некорректные данные!');
+        throw new NotFoundError('Пользователь не найден!');
       }
       res.send({ data: user });
     })

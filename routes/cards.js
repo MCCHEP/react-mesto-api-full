@@ -14,12 +14,12 @@ const urlRegex = /^https?:\/{2}\S+\.\S{2,}/;
 cards.get('/', getCards);
 cards.get('/:cardId', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().alphanum().length(24),
+    cardId: Joi.string().hex().length(24),
   }),
 }), getCardById);
 cards.delete('/:cardId', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().alphanum().length(24),
+    cardId: Joi.string().hex().length(24),
   }),
 }), deleteCardById);
 cards.post('/', celebrate({
@@ -30,12 +30,12 @@ cards.post('/', celebrate({
 }), createCard);
 cards.put('/:cardId/likes', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().alphanum().length(24),
+    cardId: Joi.string().hex().length(24),
   }),
 }), likeCard);
 cards.delete('/:cardId/likes', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().alphanum().length(24),
+    cardId: Joi.string().hex().length(24),
   }),
 }), dislikeCard);
 

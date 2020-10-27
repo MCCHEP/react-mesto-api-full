@@ -1,6 +1,6 @@
 const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
-const BadRequestError = require('../errors/bad-request-err');
+const RightsError = require('../errors/rights-err');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -21,12 +21,19 @@ module.exports.getCardById = (req, res, next) => {
 };
 
 module.exports.deleteCardById = (req, res, next) => {
-  Card.findOneAndRemove({ _id: req.params.cardId, owner: req.user._id })
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (card === null) {
         throw new NotFoundError('Карточка не найдена');
       }
-      return res.send({ data: card });
+      if (`${req.user._id}` !== `${card.owner}`) {
+        throw new RightsError('Это не ваша карточка');
+      }
+      return `${req.params.cardId}`;
+    }).then((id) => {
+      Card.findByIdAndDelete(id)
+        .then((data) => res.send({ data }))
+        .catch(next);
     })
     .catch(next);
 };
@@ -36,9 +43,6 @@ module.exports.createCard = (req, res, next) => {
   const owner = req.user._id;
   Card.create({ name, link, owner })
     .then((card) => {
-      if (!card) {
-        throw new BadRequestError('Переданы некорректные данные!');
-      }
       res.status(201).send({ data: card });
     })
     .catch(next);

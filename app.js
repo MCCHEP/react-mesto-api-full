@@ -23,11 +23,9 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useCreateIndex: true,
   useFindAndModify: false,
   useUnifiedTopology: true,
-}, () => {
-  console.log('Connected to DB!');
 });
 
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+app.listen(PORT);
 app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -56,23 +54,30 @@ app.post('/signup', celebrate({
 app.use(auth);
 app.use('/users', users);
 app.use('/cards', cards);
-
+app.all('/*', (req, res, next) => {
+  next(new Error());
+});
 app.use(errorLogger);
 
 app.use(errors());
 app.use((err, req, res, next) => {
   const BAD_REQUEST_CODE = 400;
   const NOT_FOUND_CODE = 404;
+  const CONFLICT_CODE = 409;
+
   if (err.name === 'ValidationError') {
-    return res.status(BAD_REQUEST_CODE).send('Переданы неверные данные');
+    return res.status(BAD_REQUEST_CODE).send({ message: 'Переданы неверные данные' });
   }
   if (err.name === 'CastError') {
-    return res.status(NOT_FOUND_CODE).send('Объект не найден');
+    return res.status(NOT_FOUND_CODE).send({ message: 'Объект не найден' });
+  }
+  if (err.name === 'MongoError' && err.code === 11000) {
+    return res.status(CONFLICT_CODE).send({ message: 'Вы уже регистрировались' });
   }
 
   const { statusCode = 500, message } = err;
 
-  res
+  return res
     .status(statusCode)
     .send({
       message: statusCode === 500
