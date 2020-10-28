@@ -57,7 +57,9 @@ app.use('/users', users);
 app.use('/cards', cards);
 
 app.use(errorLogger);
-
+app.all('/*', (req, res, next) => {
+  next(new Error());
+});
 app.use(errors());
 app.use((err, req, res, next) => {
   const BAD_REQUEST_CODE = 400;
