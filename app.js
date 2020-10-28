@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const NotFoundError = require('./errors/not-found-err');
 const auth = require('./middlewares/auth');
 const users = require('./routes/users');
 const cards = require('./routes/cards');
@@ -58,6 +59,9 @@ app.use('/cards', cards);
 
 app.use(errorLogger);
 
+app.all('/*', (req, res, next) => {
+  next(new NotFoundError('Ресурс не найден'));
+});
 app.use(errors());
 app.use((err, req, res, next) => {
   const BAD_REQUEST_CODE = 400;
